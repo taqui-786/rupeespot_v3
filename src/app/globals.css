@@ -1,21 +1,215 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+ 
+html, body, :root{
+  height: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: #7c3aed #ffffff;
 }
 
-@media (prefers-color-scheme: dark) {
+
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 262.1 83.3% 57.8%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 20% 98%;
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 263.4 70% 50.4%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 263.4 70% 50.4%;
+  }
+}
+.centerIt {
+  @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+/* TEXT ROTATOR STYLES  */
+.animate-text-slide {
+  animation: text-slide 12.5s cubic-bezier(0.83, 0, 0.17, 1) infinite;
+}
+
+@keyframes text-slide {
+  0%,
+  16% {
+    transform: translateY(0%);
+  }
+
+  20%,
+  36% {
+    transform: translateY(-16.65%);
+  }
+
+  40%,
+  56% {
+    transform: translateY(-33.32%);
+  }
+
+  60%,
+  76% {
+    transform: translateY(-50%);
+  }
+
+  80%,
+  96% {
+    transform: translateY(-66.65%);
+  }
+
+  100% {
+    transform: translateY(-83.33%);
+  }
+}
+
+/* CUSTOM CSS FOR THINKING LOADER */
+.thinkingLoader {
+  animation: rotate 1s infinite;
+  height: 50px;
+  width: 50px;
+}
+
+.thinkingLoader:before,
+.thinkingLoader:after {
+  border-radius: 50%;
+  content: "";
+  display: block;
+  height: 20px;
+  width: 20px;
+}
+.thinkingLoader:before {
+  animation: ball1 1s infinite;
+  background-color: #333;
+  box-shadow: 30px 0 0 #7C3AED;
+  margin-bottom: 10px;
+}
+.thinkingLoader:after {
+  animation: ball2 1s infinite;
+  background-color: #7C3AED;
+  box-shadow: 30px 0 0 #333;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg) scale(0.8) }
+  50% { transform: rotate(360deg) scale(1.2) }
+  100% { transform: rotate(720deg) scale(0.8) }
+}
+
+@keyframes ball1 {
+  0% {
+    box-shadow: 30px 0 0 #7C3AED;
+  }
+  50% {
+    box-shadow: 0 0 0 #7C3AED;
+    margin-bottom: 0;
+    transform: translate(15px, 15px);
+  }
+  100% {
+    box-shadow: 30px 0 0 #7C3AED;
+    margin-bottom: 10px;
+  }
+}
+
+@keyframes ball2 {
+  0% {
+    box-shadow: 30px 0 0 #333;
+  }
+  50% {
+    box-shadow: 0 0 0 #333;
+    margin-top: -20px;
+    transform: translate(15px, 15px);
+  }
+  100% {
+    box-shadow: 30px 0 0 #333;
+    margin-top: 0;
+  }
+}
+.ratingChart{
+  min-width: 800px;
+}
+@media  (max-width:400px) {
+  .ratingChart{
+    min-width: 0px;
+  }
+}
+.searchIcon{
+  display: inline-block;
+}
+@media(max-width:800px){
+  .searchIcon{
+    --lord-icon-colorize: #030712;
+  }
+}
+
+@keyframes gradient-x {
+  0%, 100% {
+    background-size: 400% 400%;
+    background-position: left center;
+  }
+  50% {
+    background-size: 200% 200%;
+    background-position: right center;
+  }
+}
+
+.animate-gradient-x {
+  animation: gradient-x 1.5s ease infinite;
+}
+
+/* Add these styles if not already present */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-image-container {
+  background: linear-gradient(to bottom, rgb(249 250 251), rgb(243 244 246));
+}
+
+.dark .product-image-container {
+  background: linear-gradient(to bottom, rgb(31 41 55 / 0.5), rgb(17 24 39 / 0.5));
 }
