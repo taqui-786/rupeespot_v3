@@ -105,13 +105,13 @@ const MyTrackingPage: React.FC<Props> = ({}) => {
                         {itm?.productImg ? (
                           <img
                             src={itm?.productImg}
-                            alt="emage"
+                            alt="productImage"
                             className={`rounded-lg transition-opacity duration-300 bg-cover h-full `}
                           />
                         ) : (
                           <Image
                             src={keywordImg}
-                            alt={"sdlkaljk"}
+                            alt="productImage"
                             layout="fill"
                             objectFit="cover"
                             className={`rounded-lg transition-opacity duration-300 `}

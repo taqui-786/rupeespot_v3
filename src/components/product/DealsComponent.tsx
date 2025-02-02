@@ -10,10 +10,10 @@ import { addAffiliateTag, formatPriceNumber } from "@/lib/CustomFunctions";
 import BoxReveal from "../Animations/BoxReveal";
 import { CartIcon } from "../Animations/Icons";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 type Props = {
   product: any;
@@ -76,32 +76,36 @@ const DealsComponent: React.FC<Props> = ({ product }) => {
             product?.discount || 0
           }% off`}</span>
           <div className="p-1 ">
-            <Popover>
-              <PopoverTrigger>
-                <Info className="h-5 w-5 " />
-              </PopoverTrigger>
-              <PopoverContent className="w-fit">
-              <div className="bg-primary text-primary-foreground p-2 text-center font-semibold">
-            Discount Information
-          </div>
-          <div className="p-4 bg-background">
-            <p className="text-center mb-2">
-              <span className="text-2xl font-bold text-primary">{product?.discount || 0}% OFF</span>
-            </p>
-            <p className="text-center text-sm text-muted-foreground">
-              from its Regular Price
-            </p>
-            <p className="text-center mt-2">
-              <span className="text-lg font-semibold">₹{product.reg_price}</span>
-            </p>
-          </div>
-              </PopoverContent>
-            </Popover>
+            <HoverCard>
+              <HoverCardTrigger>
+                <Info className="h-5 w-5 cursor-pointer" />
+              </HoverCardTrigger>
+              <HoverCardContent className="w-fit">
+                <div className="bg-primary text-primary-foreground p-2 text-center font-semibold">
+                  Discount Information
+                </div>
+                <div className="p-4 bg-background">
+                  <p className="text-center mb-2">
+                    <span className="text-2xl font-bold text-primary">
+                      {product?.discount || 0}% OFF
+                    </span>
+                  </p>
+                  <p className="text-center text-sm text-muted-foreground">
+                    from its Regular Price
+                  </p>
+                  <p className="text-center mt-2">
+                    <span className="text-lg font-semibold">
+                      ₹{product.reg_price}
+                    </span>
+                  </p>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
           </div>
         </div>
       </BoxReveal>
       <BoxReveal duration={0.5}>
-        <span className="text-xs flex items-center flex-row gap-1">
+        <span className="text-sm font-medium flex items-center flex-row gap-1">
           <History className="h-4 w-4" />
           {`Price updated ` + format(product?.last_updated || 0)}
         </span>
@@ -112,7 +116,10 @@ const DealsComponent: React.FC<Props> = ({ product }) => {
 
       <BoxReveal duration={0.5}>
         <div className="flex flex-row w-full   gap-4">
-          <CartIcon href={addAffiliateTag(product?.url)} store={product?.store} />
+          <CartIcon
+            href={addAffiliateTag(product?.url)}
+            store={product?.store}
+          />
           <AddToTrackingBtn
             payload={{
               id: product?.id,

@@ -9,6 +9,14 @@ import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { useData } from "@/lib/Context";
 import { GraphIcon } from "../Animations/Icons";
+import ApexCharts from "apexcharts";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 const Chart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
   loading: () => (
@@ -25,19 +33,22 @@ const ApexChart: React.FC<Props> = ({
   reg_price,
 }) => {
   const { setSuggestion, setThreeLowestPrice } = useData();
-  function getPredictedLowestPrices(payload: PricePayload[]){
-        const prices = payload.map(item => item[1]);
-  
+  function getPredictedLowestPrices(payload: PricePayload[]) {
+    const prices = payload.map((item) => item[1]);
+
     const sortedPrices = [...prices].sort((a, b) => a - b);
-  
-    const predictedPrices = sortedPrices.slice(0, 3).map(price => Math.max(Math.floor(price * 0.9), 1));
-  
-     setThreeLowestPrice(predictedPrices);
-  }  
+
+    const predictedPrices = sortedPrices
+      .slice(0, 3)
+      .map((price) => Math.max(Math.floor(price * 0.9), 1));
+
+    setThreeLowestPrice(predictedPrices);
+  }
   useEffect(() => {
     const decision = analyzePriceTrends(pricePayload);
     setSuggestion(decision);
-    getPredictedLowestPrices(pricePayload)
+    getPredictedLowestPrices(pricePayload);
+
   }, [pricePayload]);
   const { resolvedTheme } = useTheme();
   // if (pricePayload.lenght > 0) {
@@ -48,7 +59,7 @@ const ApexChart: React.FC<Props> = ({
     let threeMonthAgo = new Date();
     threeMonthAgo.setMonth(threeMonthAgo.getMonth() - 3); // Subtract 3 months
     let threeMonthAgoTimestamp = threeMonthAgo.getTime(); // Get the timestamp
-  
+
     if (firstTimestamp > threeMonthAgoTimestamp) {
       return firstTimestamp;
     } else {
@@ -225,20 +236,22 @@ const ApexChart: React.FC<Props> = ({
           <GraphIcon />
           Price History Graph
         </h1>
-        <select
-          onChange={(e) => handleSelect(e.target.value)}
-          className=" py-1 w-fit px-1 md:py-2.5  md:px-4 pe-9 block  bg-gray-100 border-primary rounded-lg text-sm  disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
-        >
-          <option value={"all"}>All Time</option>
-          {pricePayload.length > 2 && (
-            <>
-              <option selected defaultValue={"three_months"}>3 Month</option>
-              <option value={"one_month"}>1 Month</option>
-              <option value={"six_months"}>6 month</option>
-              <option value={"one_year"}>1 Year</option>
-            </>
-          )}
-        </select>
+        <Select defaultValue={pricePayload.length > 2 ? "three_months" : "all"} onValueChange={handleSelect}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Select timeline" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Time</SelectItem>
+            {pricePayload.length > 2 && (
+              <>
+                <SelectItem value="three_months">3 Months</SelectItem>
+                <SelectItem value="one_month">1 Month</SelectItem>
+                <SelectItem value="six_months">6 Months</SelectItem>
+                <SelectItem value="one_year">1 Year</SelectItem>
+              </>
+            )}
+          </SelectContent>
+        </Select>
       </div>
       <div className="overflow-hidden">
         <Chart

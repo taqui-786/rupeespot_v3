@@ -6,14 +6,18 @@ type Props = {
   id: string;
   data: any;
   store?: string;
-  type: string
+  type: string;
 };
 
-const ProductPriceChart: React.FC<Props> = async ({ id, store, data, type }) => {
-  
+const ProductPriceChart: React.FC<Props> = async ({
+  id,
+  store,
+  data,
+  type,
+}) => {
   let chartPriceData: any[] = [];
   let chartRatingData: any[] = [];
-  let RegularPrice: number = 0
+  let RegularPrice: number = 0;
   function setChartPriceData(filteredData: any[], defaultValue: any[]) {
     chartPriceData = [...filteredData, ...defaultValue];
   }
@@ -97,36 +101,32 @@ const ProductPriceChart: React.FC<Props> = async ({ id, store, data, type }) => 
     `SELECT * FROM ${getStore[0].db_name}.prices WHERE id='${id}'`
   );
   const [prices]: any = await deals_db.execute(sql`${priceQuerry}`);
-let myPrice = data?.deal_price || data?.mrp;
-let myTime =  data?.last_updated
-if(type === 'store' && data?.mrp === null){
-  const price = prices.reduce((latest:any, current:any) => {
-    const latestDate = new Date(latest.last_updated);
-    const currentDate = new Date(current.last_updated);
-    return currentDate > latestDate ? current : latest;
-  });
-  myPrice = price?.price;
-  myTime = price?.last_updated
-}
-  createChartPriceData(
-   myTime,
-    myPrice,
-    prices
-  );
+  let myPrice = data?.deal_price || data?.mrp;
+  let myTime = data?.last_updated;
+  if (type === "store" && data?.mrp === null) {
+    const price = prices.reduce((latest: any, current: any) => {
+      const latestDate = new Date(latest.last_updated);
+      const currentDate = new Date(current.last_updated);
+      return currentDate > latestDate ? current : latest;
+    });
+    myPrice = price?.price;
+    myTime = price?.last_updated;
+  }
+  createChartPriceData(myTime, myPrice, prices);
   // createChartRatingData(data?.last_updated, data?.rating_count, prices);
-  
-  if(type === 'store'){
-    
+
+  if (type === "store") {
     const reg_price_querry = sql.raw(
       `SELECT * FROM ${getStore[0].db_name}.regular_prices WHERE id='${id}'`
     );
-    const [get_req_price]:any = await deals_db.execute(sql`${reg_price_querry}`) 
-    RegularPrice = get_req_price[0]?.regular_price
-  }else{
-    RegularPrice = data?.reg_price
-
+    const [get_req_price]: any = await deals_db.execute(
+      sql`${reg_price_querry}`
+    );
+    RegularPrice = get_req_price[0]?.regular_price;
+  } else {
+    RegularPrice = data?.reg_price;
   }
-  
+
   return (
     <>
       {chartPriceData ? (

@@ -18,11 +18,11 @@ type Props = {
   return (
     <>
       {data.length ? (
-        <div className="w-full md:px-3 py-5 mt-10">
+        <div className="w-full  py-5 ">
           <h1 className="w-full text-xl sm:text-3xl font-bold text-start px-3 md:px-0">
             {listingFor === "recommend" ? "Similar Products" : "Latest Deals"}
           </h1>
-          <div className="w-full  flex flex-row flex-wrap items-center justify-center gap-1  py-8 ">
+          <div className="w-full  flex flex-row flex-wrap items-center justify-center gap-1 sm:gap-4  py-8 ">
             {data &&
               data.map((itm: any, indx: number) => {
                 if (itm?.id === name?.name?.id) return;

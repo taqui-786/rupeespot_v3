@@ -81,7 +81,7 @@ const ProductPage: React.FC<Props> = ({ data, id, store }) => {
           store={store}
           type={data && data?.store ? "deals" : "store"}
         />
-        {data ? <RecommendProduct name={data} listingFor="recommend" /> : ""}
+        {data ? <RecommendProduct  name={data} listingFor="recommend" /> : ""}
         <RecommendProduct name={data} listingFor="latest" />
       </FramerWrapper>
     </>
