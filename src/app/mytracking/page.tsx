@@ -9,7 +9,10 @@ import {
 } from "@/components/ui/card";
 import { format } from "timeago.js";
 import { useEffect, useState } from "react";
-import { MyTrackingProducts, removeFromTrackingList } from "@/lib/actions/authActions";
+import {
+  MyTrackingProducts,
+  removeFromTrackingList,
+} from "@/lib/actions/authActions";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
@@ -47,7 +50,9 @@ const MyTrackingPage: React.FC<Props> = ({}) => {
       const result = await removeFromTrackingList(id);
       setDeleted(true);
       if (result === "deletedProduct") {
-        setProducts((prevProducts) => prevProducts.filter((product) => product.productId !== id));
+        setProducts((prevProducts) =>
+          prevProducts.filter((product) => product.productId !== id)
+        );
         toast.success("Removed from My Tracking List");
       }
     } catch (error) {
@@ -78,7 +83,9 @@ const MyTrackingPage: React.FC<Props> = ({}) => {
                 to change notfication settings
               </AlertDescription>
             </Alert>
-          ): ''}
+          ) : (
+            ""
+          )}
           {loading ? (
             <>
               <div className="h-44 w-full bg-gray-200 rounded-md dark:bg-gray-700 animate-pulse"></div>
@@ -121,20 +128,32 @@ const MyTrackingPage: React.FC<Props> = ({}) => {
                               {" "}
                               {itm?.productName || `${itm?.track_value}`}
                             </h2>
-                            {
-                              itm?.productImg ?
+                            {itm?.productImg ? (
                               <Badge className="flex w-fit items-center gap-1 bg-teal-100 text-teal-800 dark:bg-teal-800/30 dark:text-teal-500">
-                              <Bell className="h-4 w-4" />
-                              Notify
-                            </Badge> :
-                             <Badge variant={'destructive'} className="flex w-fit items-center gap-1 ">
-                             <BellOff className="h-4 w-4" />
-                             Notify
-                           </Badge>
-                        }
+                                <Bell className="h-4 w-4" />
+                                Notify
+                              </Badge>
+                            ) : (
+                              <Badge
+                                variant={"destructive"}
+                                className="flex w-fit items-center gap-1 "
+                              >
+                                <BellOff className="h-4 w-4" />
+                                Notify
+                              </Badge>
+                            )}
                           </div>
-                          {itm?.custom_price !== null ?<span className="ml-1 text-sm text-gray-500">Your Custom Tracking Price Set at {`₹ ${itm?.custom_price}`} </span>: ''}
-                          <p className="text-3xl font-bold text-indigo-600 mb-4">{`₹ ${itm?.productPrice}`} </p>
+                          {itm?.custom_price !== null ? (
+                            <span className="ml-1 text-sm text-gray-500">
+                              Your Custom Tracking Price Set at{" "}
+                              {`₹ ${itm?.custom_price}`}{" "}
+                            </span>
+                          ) : (
+                            ""
+                          )}
+                          <p className="text-3xl font-bold text-indigo-600 mb-4">
+                            {`₹ ${itm?.productPrice}`}{" "}
+                          </p>
 
                           <div className="flex items-center text-sm text-gray-500 mb-4">
                             <Clock className="mr-1 h-4 w-4" />

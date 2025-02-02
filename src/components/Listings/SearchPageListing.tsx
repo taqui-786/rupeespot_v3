@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { AddToTrackingBtn } from "@/components/Product/ProductTrackingBtn";
+import { AddToTrackingBtn } from "@/components/product/ProductTrackingBtn";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
