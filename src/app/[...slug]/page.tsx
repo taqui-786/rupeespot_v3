@@ -18,6 +18,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const [getStore]: any = await user_db.execute(
     sql`SELECT db_name FROM stores WHERE name  = ${params.slug[0]} `
   );
+  if (!getStore[0]) {
+    return notFound();
+  }
   const querry =
     params.slug[0] === "deals"
       ? sql.raw(
@@ -65,6 +68,9 @@ const page = async (props: Props) => {
   const [getStore]: any = await user_db.execute(
     sql`SELECT db_name FROM stores WHERE name  = ${params.slug[0]} `
   );
+  if (!getStore[0]) {
+    return notFound();
+  }
   const querry =
     params.slug[0] === "deals"
       ? sql.raw(`SELECT * FROM deals WHERE id = '${params.slug[1]}' `)
