@@ -21,6 +21,7 @@ import CategoryHeaderDealsPage from "../product/CategoryHeaderDealsPage";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import SmoothScrollToTopButton from "../ScrollToTopBtn";
 import FilterForm from "../forms/Filter";
+import { useFetchDeals, useLoadLatestDeals, useFetchLatestPosts, FetchDealsParams } from "@/lib/authentication/AuthApis";
 
 interface Deal {
   id: string;
@@ -52,25 +53,20 @@ const DealsListings: React.FC = () => {
   const [category, setCategory] = useState<string | null>("all");
   const [store, setStore] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
+  const fetchLatestApi = useFetchLatestPosts();
+
   const fetchLatest = useCallback(async () => {
     if (filtering.brands[0] !== "all" || filtering.discounts[0] !== "0") return;
 
     try {
       const timestamp = deals[0]?.last_updated;
-      const { data } = await axios.get(
-        `/api/deals/latestpost?timestamp=${encodeURIComponent(timestamp)}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.NEXT_PUBLIC_APP_API_KEY,
-          },
-        }
-      );
-      setIsLatestPost(data.message[0].count_latest || 0);
+      const count = await fetchLatestApi.mutateAsync(timestamp);
+      setIsLatestPost(count);
     } catch (error) {
+      console.error(error);
       toast.error("Internal server error!");
     }
-  }, [deals, filtering]);
+  }, [deals, filtering, fetchLatestApi]);
 
   const getOptions = useCallback(async () => {
     try {
@@ -86,36 +82,44 @@ const DealsListings: React.FC = () => {
     }
   }, []);
 
+  const fetchDealsApi = useFetchDeals();
+  const loadLatestDealsApi = useLoadLatestDeals();
+
   const fetchDeals = useCallback(
     async (isFiltered: boolean) => {
       try {
         const nextPage = page + 1;
-        console.log(filtering);
+        
+        const params: FetchDealsParams = {
+          page,
+          items: 25,
+        };
 
-        const endpoint = isFiltered
-          ? `/api/deals?items=25&page=${page}&sortBy=${filtering.sortBy}&brand=${filtering.brands}&discount=${filtering.discounts}&rating=${filtering.rating}&vertical=${category}`
-          : `/api/deals?items=25&page=${page}`;
+        if (isFiltered) {
+          params.sortBy = filtering.sortBy;
+          params.brands = filtering.brands;
+          params.discounts = filtering.discounts;
+          params.rating = filtering.rating;
+          params.vertical = category;
+        }
 
-        const { data } = await axios.get(endpoint, {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.NEXT_PUBLIC_APP_API_KEY,
-          },
-        });
-        if (data.message.length) {
-          setDeals((prevDeals) => [...prevDeals, ...data.message]);
+        const data = await fetchDealsApi.mutateAsync(params);
+        
+        if (data.length) {
+          setDeals((prevDeals) => [...prevDeals, ...data]);
           setPage(nextPage);
         } else {
           setFound(true);
           toast.info("No more posts to load!");
         }
       } catch (error) {
+        console.error(error);
         toast.error("Failed to fetch deals!");
       } finally {
         setLoading(false);
       }
     },
-    [page, filtering, category]
+    [page, filtering, category, fetchDealsApi]
   );
 
   useEffect(() => {
@@ -141,7 +145,7 @@ const DealsListings: React.FC = () => {
     }
   }, [inView, loading, found, filtering, fetchDeals, category]);
 
-  const handleFilter = useCallback(async () => {
+  const handleFilter = useCallback(async (filterValues?: FilterState) => {
     setOpen(false);
     setFound(false);
     setLoading(true);
@@ -149,58 +153,88 @@ const DealsListings: React.FC = () => {
     setDeals([]);
 
     try {
-      const { data } = await axios.get(
-        `/api/deals?items=25&page=1&sortBy=${filtering.sortBy}&brand=${filtering.brands}&discount=${filtering.discounts}&rating=${filtering.rating}&vertical=${category}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.NEXT_PUBLIC_APP_API_KEY,
-          },
-        }
-      );
+      const params: FetchDealsParams = {
+        page: 1,
+        items: 25,
+        sortBy: filterValues?.sortBy || filtering.sortBy,
+        brands: filterValues?.brands || filtering.brands,
+        discounts: filterValues?.discounts || filtering.discounts,
+        rating: filterValues?.rating || filtering.rating,
+        vertical: category
+      };
 
-      if (data.message.length) {
-        setDeals(data.message);
+      const data = await fetchDealsApi.mutateAsync(params);
 
+      if (data.length) {
+        setDeals(data);
         toast.success("See the filtered products");
       } else {
         toast.info("Sorry, no products found!");
       }
     } catch (error) {
+      console.error(error);
       toast.error("Failed to filter products!");
     } finally {
       setLoading(false);
-      setIsFiltering(false);
     }
-  }, [filtering, category]);
+  }, [filtering, category, fetchDealsApi]);
 
-  useEffect(() => {
-    if (isFiltering) {
-      handleFilter();
-    }
-  }, [isFiltering, handleFilter]);
   const loadLatestPost = async () => {
     try {
-      const { data } = await axios.get(`/api/deals?items=25&page=1`, {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_APP_API_KEY,
-        },
-      });
-      if (data.message.length) {
+      const data = await loadLatestDealsApi.mutateAsync();
+      if (data.length) {
         setIsLatestPost(0);
         setCategory("all");
-        setDeals(data.message);
+        setDeals(data);
       } else {
         setFound(true);
         toast.info("No more posts to load!");
       }
     } catch (error) {
+      console.error(error);
       toast.error("Failed to fetch deals!");
     } finally {
       setLoading(false);
     }
   };
+
+  // Add new function to handle category changes
+  const handleCategoryChange = useCallback((newCategory: string) => {
+    setCategory(newCategory);
+    
+    const params: FetchDealsParams = {
+      page: 1,
+      items: 25,
+      sortBy: filtering.sortBy,
+      brands: filtering.brands,
+      discounts: filtering.discounts,
+      rating: filtering.rating,
+      vertical: newCategory === "all" ? "all" : newCategory
+    };
+
+    setFound(false);
+    setLoading(true);
+    setPage(1);
+    setDeals([]);
+
+    fetchDealsApi.mutateAsync(params)
+      .then(data => {
+        if (data.length) {
+          setDeals(data);
+          toast.success("See the filtered products");
+        } else {
+          toast.info("Sorry, no products found!");
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        toast.error("Failed to filter products!");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [filtering, fetchDealsApi]);
+
   return (
     <>
       <SmoothScrollToTopButton />
@@ -218,6 +252,7 @@ const DealsListings: React.FC = () => {
             defaultValue={filtering}
             isFiltering={setIsFiltering}
             storeOpitions={store}
+            onFormSubmit={handleFilter}
           />
         </SheetContent>
       </Sheet>
@@ -242,8 +277,8 @@ const DealsListings: React.FC = () => {
             </Button>
 
             <CategoryHeaderDealsPage
-              isFiltering={setIsFiltering}
-              setCategory={setCategory}
+              setCategory={handleCategoryChange}
+              isFiltering={() => {}}  // No longer needed but kept for interface compatibility
               myCategory={category}
             />
           </div>
@@ -253,7 +288,7 @@ const DealsListings: React.FC = () => {
 
       <div className="w-full relative flex flex-row mt-4 items-center justify-center pb-4 flex-wrap gap-2 sm:gap-4">
         {loading ? (
-          Array.from({ length: 8 }).map((_, index) => (
+          Array.from({ length: 10 }).map((_, index) => (
             <ProductCardLoader key={`loader-${index}`} />
           ))
         ) : deals.length > 0 ? (

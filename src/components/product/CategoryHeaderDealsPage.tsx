@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 
 interface CategoryHeaderDealsPageProps {
   setCategory: (category: string) => void;
-  isFiltering: (filtering: boolean) => void;
+  isFiltering: () => void;
   myCategory: string | null;
 }
 
@@ -80,7 +80,6 @@ export default function CategoryHeaderDealsPage({
     } else {
       setCategory(val);
     }
-    isFiltering(true);
   };
 
   return (

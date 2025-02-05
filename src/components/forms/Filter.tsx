@@ -38,6 +38,7 @@ interface FilterFormProps {
   defaultValue: FormData;
   isFiltering: (value: boolean) => void;
   storeOpitions: Array<{ id: string; label: string }>;
+  onFormSubmit?: (data: FormData) => void;
 }
 
 const discounts = [
@@ -131,6 +132,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
   defaultValue,
   isFiltering,
   storeOpitions,
+  onFormSubmit,
 }) => {
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
@@ -140,6 +142,21 @@ const FilterForm: React.FC<FilterFormProps> = ({
   const onSubmit = (data: FormData) => {
     isFiltering(true);
     myState(data);
+    onFormSubmit?.(data);
+  };
+
+  const handleReset = () => {
+    const resetValues = {
+      brands: ["all"],
+      sortBy: ["all"],
+      discounts: ["0"],
+      rating: ["all"],
+    };
+    
+    form.reset(resetValues);
+    isFiltering(false);
+    myState(resetValues);
+    onFormSubmit?.(resetValues);
   };
 
   return (
@@ -149,7 +166,10 @@ const FilterForm: React.FC<FilterFormProps> = ({
         <CheckboxGroup name="discounts" label="Discounts" options={discounts} form={form} />
         <CheckboxGroup name="sortBy" label="Sort By" options={sortBy} form={form} />
         <CheckboxGroup name="rating" label="Rating" options={rating} form={form} />
-        <Button type="submit">Submit</Button>
+        <div className="flex flex-col gap-4">
+          <Button type="submit">Submit</Button>
+          <Button type="button" variant="outline" onClick={handleReset}>Reset</Button>
+        </div>
       </form>
     </Form>
   );
