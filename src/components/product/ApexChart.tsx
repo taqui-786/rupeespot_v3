@@ -48,7 +48,6 @@ const ApexChart: React.FC<Props> = ({
     const decision = analyzePriceTrends(pricePayload);
     setSuggestion(decision);
     getPredictedLowestPrices(pricePayload);
-
   }, [pricePayload]);
   const { resolvedTheme } = useTheme();
   // if (pricePayload.lenght > 0) {
@@ -236,7 +235,7 @@ const ApexChart: React.FC<Props> = ({
           <GraphIcon />
           Price History Graph
         </h1>
-        <Select defaultValue={pricePayload.length > 2 ? "three_months" : "all"} onValueChange={handleSelect}>
+        <Select defaultValue={"all"} onValueChange={handleSelect}>
           <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="Select timeline" />
           </SelectTrigger>

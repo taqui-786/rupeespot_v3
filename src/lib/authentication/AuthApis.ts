@@ -102,6 +102,7 @@ export const useHomeDeals = () => {
       });
       return data?.message;
     },
+
   });
 };
 

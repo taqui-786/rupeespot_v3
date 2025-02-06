@@ -21,7 +21,12 @@ import CategoryHeaderDealsPage from "../product/CategoryHeaderDealsPage";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import SmoothScrollToTopButton from "../ScrollToTopBtn";
 import FilterForm from "../forms/Filter";
-import { useFetchDeals, useLoadLatestDeals, useFetchLatestPosts, FetchDealsParams } from "@/lib/authentication/AuthApis";
+import {
+  useFetchDeals,
+  useLoadLatestDeals,
+  useFetchLatestPosts,
+  FetchDealsParams,
+} from "@/lib/authentication/AuthApis";
 
 interface Deal {
   id: string;
@@ -44,6 +49,7 @@ const DealsListings: React.FC = () => {
   const [page, setPage] = useState(1);
   const { ref, inView } = useInView();
   const [isFiltering, setIsFiltering] = useState(false);
+  const [fetchingDeals, setFetchingDeals] = useState(false);
   const [filtering, setFiltering] = useState<FilterState>({
     brands: ["all"],
     sortBy: ["all"],
@@ -87,9 +93,11 @@ const DealsListings: React.FC = () => {
 
   const fetchDeals = useCallback(
     async (isFiltered: boolean) => {
+      if (fetchingDeals) return;
       try {
+        setFetchingDeals(true);
         const nextPage = page + 1;
-        
+
         const params: FetchDealsParams = {
           page,
           items: 25,
@@ -104,7 +112,7 @@ const DealsListings: React.FC = () => {
         }
 
         const data = await fetchDealsApi.mutateAsync(params);
-        
+
         if (data.length) {
           setDeals((prevDeals) => [...prevDeals, ...data]);
           setPage(nextPage);
@@ -117,9 +125,10 @@ const DealsListings: React.FC = () => {
         toast.error("Failed to fetch deals!");
       } finally {
         setLoading(false);
+        setFetchingDeals(false);
       }
     },
-    [page, filtering, category, fetchDealsApi]
+    [page, filtering, category, fetchDealsApi, fetchingDeals]
   );
 
   useEffect(() => {
@@ -145,39 +154,42 @@ const DealsListings: React.FC = () => {
     }
   }, [inView, loading, found, filtering, fetchDeals, category]);
 
-  const handleFilter = useCallback(async (filterValues?: FilterState) => {
-    setOpen(false);
-    setFound(false);
-    setLoading(true);
-    setPage(1);
-    setDeals([]);
+  const handleFilter = useCallback(
+    async (filterValues?: FilterState) => {
+      setOpen(false);
+      setFound(false);
+      setLoading(true);
+      setPage(1);
+      setDeals([]);
 
-    try {
-      const params: FetchDealsParams = {
-        page: 1,
-        items: 25,
-        sortBy: filterValues?.sortBy || filtering.sortBy,
-        brands: filterValues?.brands || filtering.brands,
-        discounts: filterValues?.discounts || filtering.discounts,
-        rating: filterValues?.rating || filtering.rating,
-        vertical: category
-      };
+      try {
+        const params: FetchDealsParams = {
+          page: 1,
+          items: 25,
+          sortBy: filterValues?.sortBy || filtering.sortBy,
+          brands: filterValues?.brands || filtering.brands,
+          discounts: filterValues?.discounts || filtering.discounts,
+          rating: filterValues?.rating || filtering.rating,
+          vertical: category,
+        };
 
-      const data = await fetchDealsApi.mutateAsync(params);
+        const data = await fetchDealsApi.mutateAsync(params);
 
-      if (data.length) {
-        setDeals(data);
-        toast.success("See the filtered products");
-      } else {
-        toast.info("Sorry, no products found!");
+        if (data.length) {
+          setDeals(data);
+          toast.success("See the filtered products");
+        } else {
+          toast.info("Sorry, no products found!");
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to filter products!");
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to filter products!");
-    } finally {
-      setLoading(false);
-    }
-  }, [filtering, category, fetchDealsApi]);
+    },
+    [filtering, category, fetchDealsApi]
+  );
 
   const loadLatestPost = async () => {
     try {
@@ -199,41 +211,45 @@ const DealsListings: React.FC = () => {
   };
 
   // Add new function to handle category changes
-  const handleCategoryChange = useCallback((newCategory: string) => {
-    setCategory(newCategory);
-    
-    const params: FetchDealsParams = {
-      page: 1,
-      items: 25,
-      sortBy: filtering.sortBy,
-      brands: filtering.brands,
-      discounts: filtering.discounts,
-      rating: filtering.rating,
-      vertical: newCategory === "all" ? "all" : newCategory
-    };
+  const handleCategoryChange = useCallback(
+    (newCategory: string) => {
+      setCategory(newCategory);
 
-    setFound(false);
-    setLoading(true);
-    setPage(1);
-    setDeals([]);
+      const params: FetchDealsParams = {
+        page: 1,
+        items: 25,
+        sortBy: filtering.sortBy,
+        brands: filtering.brands,
+        discounts: filtering.discounts,
+        rating: filtering.rating,
+        vertical: newCategory === "all" ? "all" : newCategory,
+      };
 
-    fetchDealsApi.mutateAsync(params)
-      .then(data => {
-        if (data.length) {
-          setDeals(data);
-          toast.success("See the filtered products");
-        } else {
-          toast.info("Sorry, no products found!");
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        toast.error("Failed to filter products!");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [filtering, fetchDealsApi]);
+      setFound(false);
+      setLoading(true);
+      setPage(1);
+      setDeals([]);
+
+      fetchDealsApi
+        .mutateAsync(params)
+        .then((data) => {
+          if (data.length) {
+            setDeals(data);
+            toast.success("See the filtered products");
+          } else {
+            toast.info("Sorry, no products found!");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error("Failed to filter products!");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    },
+    [filtering, fetchDealsApi]
+  );
 
   return (
     <>
@@ -278,7 +294,7 @@ const DealsListings: React.FC = () => {
 
             <CategoryHeaderDealsPage
               setCategory={handleCategoryChange}
-              isFiltering={() => {}}  // No longer needed but kept for interface compatibility
+              isFiltering={() => {}} // No longer needed but kept for interface compatibility
               myCategory={category}
             />
           </div>

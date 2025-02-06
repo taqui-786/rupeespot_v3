@@ -94,7 +94,7 @@ const DealsComponent: React.FC<Props> = ({ product }) => {
                     from its Regular Price
                   </p>
                   <p className="text-center mt-2">
-                    <span className="text-lg font-semibold">
+                    <span className="text-2xl font-semibold">
                       ₹{product.reg_price}
                     </span>
                   </p>
