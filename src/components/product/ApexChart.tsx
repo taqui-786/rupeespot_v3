@@ -50,20 +50,21 @@ const ApexChart: React.FC<Props> = ({
     getPredictedLowestPrices(pricePayload);
   }, [pricePayload]);
   const { resolvedTheme } = useTheme();
-  // if (pricePayload.lenght > 0) {
-  // }
-  var [[firstTimestamp, firstPrice]] = pricePayload;
-  // var [[firstRatingTimestamp, firstRating]] = ratingPayload;
-  function getAdjustedTimestamp() {
-    let threeMonthAgo = new Date();
-    threeMonthAgo.setMonth(threeMonthAgo.getMonth() - 3); // Subtract 3 months
-    let threeMonthAgoTimestamp = threeMonthAgo.getTime(); // Get the timestamp
 
-    if (firstTimestamp > threeMonthAgoTimestamp) {
-      return firstTimestamp;
-    } else {
-      return threeMonthAgoTimestamp;
-    }
+  var [[firstTimestamp, firstPrice]] = pricePayload;
+
+  function getAdjustedTimestamp() {
+    //  Commented out for now as we are not using the three month ago timestamp ----- Taqui
+    // let threeMonthAgo = new Date();
+    // threeMonthAgo.setMonth(threeMonthAgo.getMonth() - 3); // Subtract 3 months
+    // let threeMonthAgoTimestamp = threeMonthAgo.getTime(); // Get the timestamp
+
+    // if (firstTimestamp > threeMonthAgoTimestamp) {
+    //   return firstTimestamp;
+    // } else {
+    //   return threeMonthAgoTimestamp;
+    // }
+    return firstTimestamp;
   }
   // APEX CHART CONFIGURATIONS
   const series = [

@@ -1,19 +1,15 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 
-type SignOpition = {
-  expiresIn: string | number;
-};
-
-const DEFAULT_SIGN_OPITION: SignOpition = {
-  expiresIn: "1d",
+const DEFAULT_SIGN_OPTION: SignOptions = {
+  expiresIn: 60 * 60 * 24 * 30,
 };
 
 export const signJwt = (
   payload: JwtPayload,
-  opition: SignOpition = DEFAULT_SIGN_OPITION
+  option: SignOptions = DEFAULT_SIGN_OPTION
 ) => {
   const secretKey = process.env.JWT_USER_ID_SECRET!;
-  const token = jwt.sign(payload, secretKey, opition);
+  const token = jwt.sign(payload, secretKey, option);
   return token;
 };
 

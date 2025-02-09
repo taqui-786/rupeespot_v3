@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-
+import '@/components/Cronjob_init';
 import { Toaster } from "sonner";
 import Provider from "@/components/Provider";
 import Footer from "@/components/Footer";
@@ -36,7 +36,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // initCronJob()
+
   return (
     <html lang="en" suppressHydrationWarning={true} className="scroll-smooth">
       <body className={cn("relative h-full antialiased", roboto.className)}>

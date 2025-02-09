@@ -1,17 +1,27 @@
-import 'dotenv/config'
-import { drizzle } from 'drizzle-orm/mysql2';
-import mysql from 'mysql2/promise';
+import "dotenv/config";
+import { drizzle } from "drizzle-orm/mysql2";
+import mysql, { PoolOptions } from "mysql2/promise";
 
-const poolConfig = {
-  connectionLimit: 10,  // Adjust this number based on your needs and server capacity
+const poolConfig: PoolOptions = {
+ 
+  connectionLimit: 10,
   queueLimit: 0,
   waitForConnections: true,
 };
 
-const connectDealsDb = mysql.createPool(process.env.DEALS_DB_URL as string, poolConfig);
-const connectFlipcartDb = mysql.createPool(process.env.FLIPKART_DB_URL as string, poolConfig);
-const connectUserDb = mysql.createPool(process.env.USER_DB_URL as string, poolConfig);
-const connectAJIODb = mysql.createPool(process.env.AJIO_DB_URL as string, poolConfig);
+const connectDealsDb = mysql.createPool({...poolConfig, uri: process.env.DEALS_DB_URL as string});
+const connectFlipcartDb = mysql.createPool({
+  ...poolConfig,
+  uri: process.env.FLIPKART_DB_URL as string,
+});
+const connectUserDb = mysql.createPool({
+  ...poolConfig,
+  uri: process.env.USER_DB_URL as string,
+});
+const connectAJIODb = mysql.createPool({
+  ...poolConfig,
+  uri: process.env.AJIO_DB_URL as string,
+});
 
 export const deals_db = drizzle(connectDealsDb);
 export const flipkart_db = drizzle(connectFlipcartDb);

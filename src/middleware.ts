@@ -3,10 +3,11 @@ export function middleware(req: NextRequest) {
   if (
     req.nextUrl.pathname.startsWith("/api/auth") ||
     req.nextUrl.pathname.startsWith("/api/og") ||
-    req.nextUrl.pathname.startsWith("/api/user")
+    req.nextUrl.pathname.startsWith("/api/user") 
   ) {
     return NextResponse.next();
   }
+
   // Create a response object
   const res = NextResponse.next();
 

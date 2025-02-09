@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
 
 const API_KEY = process.env.NEXT_PUBLIC_APP_API_KEY;
 
@@ -17,14 +16,6 @@ interface RegisterUserResponse {
   email: string;
   firstname: string;
   lastname: string;
-}
-
-// Add new interface for filtering options
-interface FilteringOptions {
-  sortBy?: string;
-  brands?: string;
-  discounts?: string;
-  rating?: string;
 }
 
 // Add interface for Deal
@@ -51,9 +42,11 @@ export interface FetchDealsParams {
 
 // Add interface for latest posts response
 interface LatestPostsResponse {
-  message: [{
-    count_latest: number;
-  }];
+  message: [
+    {
+      count_latest: number;
+    }
+  ];
 }
 
 // API endpoints
@@ -102,7 +95,6 @@ export const useHomeDeals = () => {
       });
       return data?.message;
     },
-
   });
 };
 
@@ -136,19 +128,19 @@ export const useFetchDeals = () => {
       brands,
       discounts,
       rating,
-      vertical
+      vertical,
     }: FetchDealsParams) => {
       const params = new URLSearchParams({
         items: items.toString(),
         page: page.toString(),
       });
 
-      if (sortBy?.length) params.append('sortBy', sortBy.join(','));
-      if (brands?.length) params.append('brand', brands.join(','));
-      if (discounts?.length) params.append('discount', discounts.join(','));
-      if (rating?.length) params.append('rating', rating.join(','));
-      if (vertical) params.append('vertical', vertical);
-      
+      if (sortBy?.length) params.append("sortBy", sortBy.join(","));
+      if (brands?.length) params.append("brand", brands.join(","));
+      if (discounts?.length) params.append("discount", discounts.join(","));
+      if (rating?.length) params.append("rating", rating.join(","));
+      if (vertical) params.append("vertical", vertical);
+
       const { data } = await axios.get<DealsResponse>(`/api/deals?${params}`, {
         headers: {
           "Content-Type": "application/json",
@@ -165,12 +157,15 @@ export const useLoadLatestDeals = () => {
   return useMutation({
     mutationKey: [AUTH_TAGS.deals, "latest"],
     mutationFn: async () => {
-      const { data } = await axios.get<DealsResponse>('/api/deals?items=25&page=1', {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": API_KEY,
-        },
-      });
+      const { data } = await axios.get<DealsResponse>(
+        "/api/deals?items=25&page=1",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": API_KEY,
+          },
+        }
+      );
       return data.message;
     },
   });
